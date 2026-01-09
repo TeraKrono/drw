@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гра: Вгадай слово по малюнку (Мультиплеєр)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Екран входу -->
+    <div id="lobbyScreen" class="screen">
+        <div class="lobby-container">
+            <h1>🎨 Вгадай слово по малюнку</h1>
+            <p class="subtitle">Мультиплеєрна онлайн гра</p>
+            
+            <div class="lobby-form">
+                <input type="text" id="playerName" placeholder="Введіть ваше ім'я..." maxlength="20" required>
+                
+                <div class="lobby-buttons">
+                    <button id="createRoomBtn" class="btn btn-primary">Створити кімнату</button>
+                    <div class="or-divider">або</div>
+                    <div class="join-form">
+                        <input type="text" id="roomCode" placeholder="Код кімнати (6 символів)" maxlength="6">
+                        <button id="joinRoomBtn" class="btn btn-success">Приєднатися</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Екран очікування -->
+    <div id="waitingScreen" class="screen hidden">
+        <div class="waiting-container">
+            <h2>Кімната: <span id="roomCodeDisplay"></span></h2>
+            <p class="info-text">Поділіться цим кодом з друзями!</p>
+            
+            <div class="players-waiting">
+                <h3>Гравці в кімнаті (<span id="playerCount">1</span>/8):</h3>
+                <ul id="waitingPlayersList"></ul>
+            </div>
+            
+            <button id="startGameBtn" class="btn btn-primary">Почати гру</button>
+            <button id="leaveRoomBtn" class="btn btn-danger">Покинути кімнату</button>
+        </div>
+    </div>
+
+    <!-- Екран гри -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="container">
+            <header>
+                <h1>🎨 Вгадай слово по малюнку</h1>
+                <div class="game-info">
+                    <div class="room-code">Кімната: <span id="gameRoomCode"></span></div>
+                    <div class="round">Раунд: <span id="roundNumber">1</span></div>
+                    <div class="timer">Час: <span id="timer">80</span>с</div>
+                </div>
+            </header>
+
+            <main>
+                <div class="game-layout">
+                    <!-- Ліва панель: Гравці -->
+                    <aside class="players-sidebar">
+                        <h3>Гравці</h3>
+                        <ul id="playersList"></ul>
+                    </aside>
+
+                    <!-- Центр: Canvas та інформація -->
+                    <section class="game-center">
+                        <div class="word-display">
+                            <h2 id="gameStatus">Очікування...</h2>
+                            <div class="secret-word" id="secretWord">_ _ _ _ _</div>
+                        </div>
+
+                        <div class="canvas-container">
+                            <div class="tools" id="drawingTools">
+                                <div class="tool-group">
+                                    <label>Колір:</label>
+                                    <input type="color" id="colorPicker" value="#000000">
+                                </div>
+                                <div class="tool-group">
+                                    <label>Товщина:</label>
+                                    <input type="range" id="brushSize" min="1" max="20" value="3">
+                                    <span id="brushSizeValue">3</span>
+                                </div>
+                                <button id="clearBtn" class="btn btn-danger">🗑️ Очистити</button>
+                            </div>
+                            <canvas id="drawingCanvas" width="800" height="600"></canvas>
+                        </div>
+                    </section>
+
+                    <!-- Права панель: Чат -->
+                    <aside class="chat-sidebar">
+                        <h3>Чат</h3>
+                        <div id="chatMessages" class="chat-messages"></div>
+                        <div class="chat-input-group">
+                            <input type="text" id="chatInput" placeholder="Введіть відповідь або повідомлення...">
+                            <button id="sendBtn" class="btn btn-success">📤</button>
+                        </div>
+                    </aside>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
