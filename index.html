@@ -74,19 +74,21 @@
                         </div>
 
                         <div class="canvas-container">
-                            <div class="tools" id="drawingTools">
-                                <div class="tool-group">
-                                    <label>Колір:</label>
-                                    <input type="color" id="colorPicker" value="#000000">
+                            <div class="canvas-with-tools">
+                                <div class="tools" id="drawingTools">
+                                    <div class="tool-group">
+                                        <label>Колір:</label>
+                                        <input type="color" id="colorPicker" value="#000000">
+                                    </div>
+                                    <div class="tool-group">
+                                        <label>Товщина:</label>
+                                        <input type="range" id="brushSize" min="1" max="20" value="3">
+                                        <span id="brushSizeValue">3</span>
+                                    </div>
+                                    <button id="clearBtn" class="btn btn-danger">🗑️ Очистити</button>
                                 </div>
-                                <div class="tool-group">
-                                    <label>Товщина:</label>
-                                    <input type="range" id="brushSize" min="1" max="20" value="3">
-                                    <span id="brushSizeValue">3</span>
-                                </div>
-                                <button id="clearBtn" class="btn btn-danger">🗑️ Очистити</button>
+                                <canvas id="drawingCanvas" width="800" height="600"></canvas>
                             </div>
-                            <canvas id="drawingCanvas" width="800" height="600"></canvas>
                         </div>
                     </section>
 
