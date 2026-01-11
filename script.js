@@ -38,6 +38,10 @@ const clockTickSound = document.getElementById('clockTickSound');
 const correctAnswerSound = document.getElementById('correctAnswerSound');
 const volumeSlider = document.getElementById('volumeSlider');
 let isClockTicking = false;
+
+// Встановлення гучності для звукових ефектів
+clockTickSound.volume = 0.20;
+correctAnswerSound.volume = 0.20;
 const gameStatus = document.getElementById('gameStatus');
 const secretWord = document.getElementById('secretWord');
 const playersList = document.getElementById('playersList');
