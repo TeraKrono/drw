@@ -70,6 +70,21 @@ function getRandomWord() {
     return words[Math.floor(Math.random() * words.length)];
 }
 
+function get3RandomWords() {
+    const selectedWords = [];
+    const usedIndices = new Set();
+    
+    while (selectedWords.length < 3) {
+        const index = Math.floor(Math.random() * words.length);
+        if (!usedIndices.has(index)) {
+            usedIndices.add(index);
+            selectedWords.push(words[index]);
+        }
+    }
+    
+    return selectedWords;
+}
+
 function isOneLetterOff(guess, correct) {
     if (Math.abs(guess.length - correct.length) > 1) return false;
     
@@ -109,12 +124,15 @@ function createRoom(roomId, hostId) {
         players: new Map(),
         currentDrawer: null,
         currentWord: '',
+        wordChoices: [],
         round: 0,
         roundTime: 80,
         timeLeft: 80,
         gameStarted: false,
         timer: null,
-        guessedPlayers: new Set()
+        guessedPlayers: new Set(),
+        choiceTimer: null,
+        waitingForWordChoice: false
     };
 }
 
@@ -155,13 +173,61 @@ function startRound(roomId) {
     const nextDrawerIndex = (currentDrawerIndex + 1) % playerIds.length;
     room.currentDrawer = playerIds[nextDrawerIndex];
     
-    // Вибір слова
-    room.currentWord = getRandomWord();
+    // Генерація 3 випадкових слів для вибору
+    room.wordChoices = get3RandomWords();
+    room.waitingForWordChoice = true;
+    room.gameStarted = false;
+
+    // Повідомлення художнику про вибір слова
+    io.to(room.currentDrawer).emit('choose-word', {
+        words: room.wordChoices,
+        round: room.round
+    });
+    
+    // Повідомлення іншим гравцям про очікування
+    playerIds.forEach(playerId => {
+        if (playerId !== room.currentDrawer) {
+            io.to(playerId).emit('waiting-for-word', {
+                drawer: room.players.get(room.currentDrawer).name,
+                round: room.round
+            });
+        }
+    });
+    
+    // Таймер на вибір слова (10 секунд)
+    let choiceTime = 10;
+    room.choiceTimer = setInterval(() => {
+        choiceTime--;
+        io.to(room.currentDrawer).emit('choice-timer-update', { time: choiceTime });
+        
+        if (choiceTime <= 0) {
+            clearInterval(room.choiceTimer);
+            // Якщо художник не вибрав, вибираємо перше слово автоматично
+            if (room.waitingForWordChoice) {
+                startDrawingPhase(roomId, room.wordChoices[0]);
+            }
+        }
+    }, 1000);
+}
+
+function startDrawingPhase(roomId, chosenWord) {
+    const room = rooms.get(roomId);
+    if (!room) return;
+    
+    room.currentWord = chosenWord;
     room.timeLeft = room.roundTime;
     room.gameStarted = true;
-
-    // Повідомлення художнику
-    io.to(room.currentDrawer).emit('your-turn', {
+    room.waitingForWordChoice = false;
+    
+    if (room.choiceTimer) {
+        clearInterval(room.choiceTimer);
+        room.choiceTimer = null;
+    }
+    
+    const playerIds = Array.from(room.players.keys());
+    
+    // Повідомлення художнику що слово вибрано
+    io.to(room.currentDrawer).emit('word-chosen', {
         word: room.currentWord,
         round: room.round
     });
@@ -323,6 +389,16 @@ io.on('connection', (socket) => {
         console.log(`Гра почалася в кімнаті ${socket.roomId}`);
     });
 
+    socket.on('word-selected', (data) => {
+        const room = rooms.get(socket.roomId);
+        if (!room || room.currentDrawer !== socket.id || !room.waitingForWordChoice) return;
+        
+        const selectedWord = room.wordChoices[data.index];
+        if (!selectedWord) return;
+        
+        startDrawingPhase(socket.roomId, selectedWord);
+    });
+
     socket.on('draw', (data) => {
         const room = rooms.get(socket.roomId);
         if (!room || room.currentDrawer !== socket.id) return;
@@ -408,6 +484,7 @@ io.on('connection', (socket) => {
 
         if (room.players.size === 0) {
             clearInterval(room.timer);
+            if (room.choiceTimer) clearInterval(room.choiceTimer);
             rooms.delete(roomId);
             console.log(`Кімната ${roomId} видалена`);
         } else {

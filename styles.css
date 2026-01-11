@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #758ae7 0%, #9f62db 100%);
     min-height: 100vh;
     padding: 5px;
 }
@@ -22,6 +22,72 @@ body {
     display: none !important;
 }
 
+/* Модальне вікно вибору слова */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-content h2 {
+    color: #667eea;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.word-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.word-choice-btn {
+    padding: 20px 30px;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: 3px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.word-choice-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.05);
+}
+
+.choice-timer {
+    color: #764ba2;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.choice-timer span {
+    color: #f45c43;
+    font-size: 1.4em;
+}
+
 .container {
     max-width: 1400px;
     width: 100%;
@@ -35,7 +101,7 @@ body {
 /* Екран входу */
 .lobby-container {
     background: white;
-    padding: 50px;
+    padding: 40px;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     max-width: 500px;
@@ -176,7 +242,7 @@ body {
 /* Екран гри */
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b5ae2 0%, #764ba2 100%);
     color: white;
     padding: 10px;
     text-align: center;
@@ -389,8 +455,39 @@ header h1 {
     font-size: 0.85em;
 }
 
+.color-presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.color-btn {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.color-btn:active {
+    transform: scale(0.95);
+}
+
+.color-btn[data-color="#FFFFFF"] {
+    border: 2px solid #333;
+}
+
 #colorPicker {
-    width: 80px;
+    width: 100%;
     height: 35px;
     border: none;
     border-radius: 5px;
@@ -421,10 +518,10 @@ canvas {
     cursor: crosshair;
     background: white;
     display: block;
-    width: 100%;
-    max-width: 90%;
-
+    width: 85%;
+    max-width: 85%;
     height: auto;
+    aspect-ratio: 4 / 3;
 }
 
 canvas.disabled {

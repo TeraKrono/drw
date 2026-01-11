@@ -12,6 +12,7 @@ let players = [];
 const lobbyScreen = document.getElementById('lobbyScreen');
 const waitingScreen = document.getElementById('waitingScreen');
 const gameScreen = document.getElementById('gameScreen');
+const wordChoiceModal = document.getElementById('wordChoiceModal');
 
 // Елементи лобі
 const playerNameInput = document.getElementById('playerName');
@@ -80,6 +81,14 @@ function draw(e) {
     const currentX = (e.clientX - rect.left) * scaleX;
     const currentY = (e.clientY - rect.top) * scaleY;
     
+    // Перевірка чи координати в межах canvas
+    if (currentX < 0 || currentX > canvas.width || currentY < 0 || currentY > canvas.height) {
+        // Оновлюємо позицію але не малюємо
+        lastX = currentX;
+        lastY = currentY;
+        return;
+    }
+    
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(currentX, currentY);
@@ -106,7 +115,19 @@ function stopDrawing() {
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseout', stopDrawing);
+
+// Глобальні події для відстеження миші навіть за межами canvas
+document.addEventListener('mousemove', (e) => {
+    if (isDrawing && isDrawer) {
+        draw(e);
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (isDrawing) {
+        stopDrawing();
+    }
+});
 
 // Підтримка тачскріну
 canvas.addEventListener('touchstart', (e) => {
@@ -141,6 +162,16 @@ canvas.addEventListener('touchend', (e) => {
 // Оновлення товщини пензля
 brushSize.addEventListener('input', (e) => {
     brushSizeValue.textContent = e.target.value;
+});
+
+// Швидкий вибір кольору
+const colorBtns = document.querySelectorAll('.color-btn');
+colorBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const color = btn.getAttribute('data-color');
+        colorPicker.value = color;
+        ctx.strokeStyle = color;
+    });
 });
 
 // Очистка canvas
@@ -263,6 +294,24 @@ function setDrawingMode(canDraw) {
     }
 }
 
+function showWordChoice(words) {
+    const wordChoiceBtns = document.querySelectorAll('.word-choice-btn');
+    wordChoiceBtns.forEach((btn, index) => {
+        btn.textContent = words[index];
+        btn.onclick = () => selectWord(index);
+    });
+    wordChoiceModal.classList.remove('hidden');
+}
+
+function hideWordChoice() {
+    wordChoiceModal.classList.add('hidden');
+}
+
+function selectWord(index) {
+    socket.emit('word-selected', { index });
+    hideWordChoice();
+}
+
 // Обробники подій Socket.IO
 socket.on('room-created', (data) => {
     currentRoom = data.roomId;
@@ -312,6 +361,39 @@ socket.on('your-turn', (data) => {
     secretWord.textContent = data.word;
     roundNumber.textContent = data.round;
     addChatMessage(`Раунд ${data.round}: Ваша черга малювати слово "${data.word}"`, true);
+});
+
+socket.on('choose-word', (data) => {
+    showScreen(gameScreen);
+    roundNumber.textContent = data.round;
+    gameStatus.textContent = 'Оберіть слово для малювання';
+    secretWord.textContent = '? ? ?';
+    showWordChoice(data.words);
+    addChatMessage(`Раунд ${data.round}: Оберіть слово`, true);
+});
+
+socket.on('choice-timer-update', (data) => {
+    const choiceTimerEl = document.getElementById('choiceTimer');
+    if (choiceTimerEl) {
+        choiceTimerEl.textContent = data.time;
+    }
+});
+
+socket.on('word-chosen', (data) => {
+    hideWordChoice();
+    setDrawingMode(true);
+    gameStatus.textContent = 'Ви малюєте!';
+    secretWord.textContent = data.word;
+    addChatMessage(`Ви малюєте слово: "${data.word}"`, true);
+});
+
+socket.on('waiting-for-word', (data) => {
+    showScreen(gameScreen);
+    setDrawingMode(false);
+    gameStatus.textContent = `${data.drawer} обирає слово...`;
+    secretWord.textContent = 'Очікування...';
+    roundNumber.textContent = data.round;
+    addChatMessage(`Раунд ${data.round}: ${data.drawer} обирає слово`, true);
 });
 
 socket.on('new-round', (data) => {

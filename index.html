@@ -46,6 +46,19 @@
         </div>
     </div>
 
+    <!-- Модальне вікно вибору слова -->
+    <div id="wordChoiceModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Оберіть слово для малювання:</h2>
+            <div class="word-choices">
+                <button class="word-choice-btn btn btn-primary" data-index="0"></button>
+                <button class="word-choice-btn btn btn-primary" data-index="1"></button>
+                <button class="word-choice-btn btn btn-primary" data-index="2"></button>
+            </div>
+            <p class="choice-timer">Час на вибір: <span id="choiceTimer">10</span>с</p>
+        </div>
+    </div>
+
     <!-- Екран гри -->
     <div id="gameScreen" class="screen hidden">
         <div class="container">
@@ -78,6 +91,16 @@
                                 <div class="tools" id="drawingTools">
                                     <div class="tool-group">
                                         <label>Колір:</label>
+                                        <div class="color-presets">
+                                            <button class="color-btn" data-color="#000000" style="background: #000000;" title="Чорний"></button>
+                                            <button class="color-btn" data-color="#FF0000" style="background: #FF0000;" title="Червоний"></button>
+                                            <button class="color-btn" data-color="#00FF00" style="background: #00FF00;" title="Зелений"></button>
+                                            <button class="color-btn" data-color="#0000FF" style="background: #0000FF;" title="Синій"></button>
+                                            <button class="color-btn" data-color="#FFFF00" style="background: #FFFF00;" title="Жовтий"></button>
+                                            <button class="color-btn" data-color="#FF6600" style="background: #FF6600;" title="Помаранчевий"></button>
+                                            <button class="color-btn" data-color="#9933FF" style="background: #9933FF;" title="Фіолетовий"></button>
+                                            <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF;" title="Білий"></button>
+                                        </div>
                                         <input type="color" id="colorPicker" value="#000000">
                                     </div>
                                     <div class="tool-group">
