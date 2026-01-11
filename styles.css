@@ -8,7 +8,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #758ae7 0%, #9f62db 100%);
     min-height: 100vh;
-    padding: 5px;
+    padding: 0;
 }
 
 .screen {
@@ -117,8 +117,50 @@ body {
 
 .subtitle {
     color: #666;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     font-size: 1.1em;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.volume-control label {
+    font-size: 1.2em;
+}
+
+#volumeSlider {
+    width: 150px;
+    height: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+#volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#volumeSlider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
 }
 
 .lobby-form {
@@ -377,7 +419,8 @@ header h1 {
 }
 
 #sendBtn {
-    padding: 10px 15px;
+    padding: 10px 12px;
+    flex-shrink: 0;
 }
 
 /* Центральна панель */
@@ -703,5 +746,333 @@ canvas.disabled {
         flex: 1;
         min-width: 150px;
         margin-bottom: 0;
+    }
+}
+
+/* Адаптація для мобільних телефонів */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .screen {
+        min-height: 95vh;
+        padding: 10px 5px;
+    }
+
+    /* Модальне вікно на мобільних */
+    .modal-content {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+
+    .word-choice-btn {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+
+    .choice-timer {
+        font-size: 0.9em;
+    }
+
+    .choice-timer span {
+        font-size: 1.1em;
+    }
+
+    /* Лобі для мобільних */
+    .lobby-container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .lobby-container h1 {
+        font-size: 1.8em;
+    }
+
+    .subtitle {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    .join-form {
+        flex-direction: column;
+    }
+
+    .join-form .btn {
+        width: 100%;
+        padding: 12px 15px;
+    }
+
+    /* Очікування для мобільних */
+    .waiting-container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .waiting-container h2 {
+        font-size: 1.3em;
+    }
+
+    #roomCodeDisplay {
+        font-size: 1.2em;
+        letter-spacing: 2px;
+    }
+
+    /* Ігровий екран */
+    header {
+        padding: 8px 5px;
+    }
+
+    header h1 {
+        font-size: 1.1em;
+        margin-bottom: 3px;
+    }
+
+    .game-info {
+        font-size: 0.75em;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .game-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "center"
+            "chat";
+        gap: 5px;
+        padding: 5px;
+    }
+
+    /* Приховуємо бокову панель гравців на мобільних, показуємо в хедері */
+    .players-sidebar {
+        display: none;
+    }
+
+    .game-center {
+        grid-area: center;
+    }
+
+    .chat-sidebar {
+        grid-area: chat;
+        max-height: 250px;
+    }
+
+    /* Центральна панель */
+    .word-display {
+        padding: 5px;
+    }
+
+    .word-display h2 {
+        font-size: 0.85em;
+        margin-bottom: 3px;
+    }
+
+    #gameStatus {
+        font-size: 0.9em;
+    }
+
+    .secret-word {
+        font-size: 1.1em;
+        padding: 6px;
+        margin: 5px 0;
+        letter-spacing: 2px;
+    }
+
+    /* Canvas */
+    .canvas-container {
+        padding: 5px;
+    }
+
+    .canvas-with-tools {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    canvas {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        border-width: 2px;
+    }
+
+    .tools {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 8px;
+        min-width: auto;
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .tool-group {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        flex: 0 1 auto;
+    }
+
+    .tool-group label {
+        font-size: 0.75em;
+        margin: 0;
+    }
+
+    .color-presets {
+        grid-template-columns: repeat(8, 1fr);
+        gap: 3px;
+        margin-bottom: 0;
+        order: 1;
+        width: 100%;
+    }
+
+    .color-btn {
+        min-width: 25px;
+        min-height: 25px;
+    }
+
+    #colorPicker {
+        height: 28px;
+        width: 50px;
+    }
+
+    #brushSize {
+        width: 60px;
+    }
+
+    #brushSizeValue {
+        font-size: 0.8em;
+        min-width: 20px;
+    }
+
+    #clearBtn {
+        margin-top: 0;
+        padding: 6px 10px;
+        font-size: 0.75em;
+        white-space: nowrap;
+    }
+
+    /* Чат */
+    .chat-sidebar h3 {
+        font-size: 0.9em;
+        margin-bottom: 5px;
+    }
+
+    .chat-messages {
+        height: 150px;
+        padding: 5px;
+        margin-bottom: 5px;
+        font-size: 0.75em;
+    }
+
+    .chat-message {
+        margin-bottom: 5px;
+        padding: 5px 8px;
+        font-size: 0.85em;
+    }
+
+    .chat-input-group {
+        gap: 3px;
+    }
+
+    #chatInput {
+        padding: 8px;
+        font-size: 0.85em;
+    }
+
+    #sendBtn {
+        padding: 8px;
+        font-size: 0.85em;
+        flex-shrink: 0;
+    }
+
+    /* Кнопки */
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.9em;
+    }
+
+    #playerName, #roomCode {
+        padding: 12px;
+        font-size: 1em;
+    }
+
+    /* Список гравців в очікуванні */
+    #waitingPlayersList li {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    .players-waiting {
+        padding: 15px;
+    }
+
+    .waiting-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .waiting-buttons .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 0.95em;
+    }
+
+    .game-info {
+        font-size: 0.7em;
+        gap: 8px;
+    }
+
+    .word-display h2 {
+        font-size: 0.75em;
+    }
+
+    #gameStatus {
+        font-size: 0.8em;
+    }
+
+    .secret-word {
+        font-size: 1em;
+        letter-spacing: 1px;
+    }
+
+    .chat-messages {
+        height: 120px;
+        font-size: 0.8em;
+    }
+
+    .chat-message {
+        font-size: 0.8em;
+    }
+
+    #chatInput {
+        font-size: 0.8em;
+    }
+
+    #sendBtn {
+        padding: 8px 10px;
+        font-size: 0.8em;
+    }
+
+    .lobby-container h1 {
+        font-size: 1.5em;
+    }
+
+    .modal-content h2 {
+        font-size: 1em;
+    }
+
+    .word-choice-btn {
+        padding: 10px 12px;
+        font-size: 0.9em;
     }
 }

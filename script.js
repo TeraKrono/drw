@@ -31,6 +31,13 @@ const leaveRoomBtn = document.getElementById('leaveRoomBtn');
 const gameRoomCode = document.getElementById('gameRoomCode');
 const roundNumber = document.getElementById('roundNumber');
 const timerEl = document.getElementById('timer');
+
+// Аудіо елементи
+const lobbyMusic = document.getElementById('lobbyMusic');
+const clockTickSound = document.getElementById('clockTickSound');
+const correctAnswerSound = document.getElementById('correctAnswerSound');
+const volumeSlider = document.getElementById('volumeSlider');
+let isClockTicking = false;
 const gameStatus = document.getElementById('gameStatus');
 const secretWord = document.getElementById('secretWord');
 const playersList = document.getElementById('playersList');
@@ -60,6 +67,35 @@ function initCanvas() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 }
+
+// Ініціалізація фонової музики
+function initLobbyMusic() {
+    lobbyMusic.volume = volumeSlider.value / 100;
+    
+    // Спроба запустити музику відразу
+    const playMusic = () => {
+        lobbyMusic.play().catch(e => {
+            // Браузер може блокувати автоплей, тому запускаємо при першій взаємодії
+            console.log('Autoplay blocked, will start on user interaction');
+            document.addEventListener('click', () => {
+                lobbyMusic.play().catch(err => console.log('Music play failed:', err));
+            }, { once: true });
+        });
+    };
+    
+    // Якщо аудіо вже готове - запускаємо відразу
+    if (lobbyMusic.readyState >= 3) {
+        playMusic();
+    } else {
+        // Інакше чекаємо поки завантажиться
+        lobbyMusic.addEventListener('canplaythrough', playMusic, { once: true });
+    }
+}
+
+// Контроль гучності
+volumeSlider.addEventListener('input', (e) => {
+    lobbyMusic.volume = e.target.value / 100;
+});
 
 // Функції малювання
 function startDrawing(e) {
@@ -314,6 +350,10 @@ function selectWord(index) {
 
 // Обробники подій Socket.IO
 socket.on('room-created', (data) => {
+    // Зупинка фонової музики
+    lobbyMusic.pause();
+    lobbyMusic.currentTime = 0;
+    
     currentRoom = data.roomId;
     isHost = data.isHost;
     roomCodeDisplay.textContent = data.roomId;
@@ -327,6 +367,10 @@ socket.on('room-created', (data) => {
 });
 
 socket.on('room-joined', (data) => {
+    // Зупинка фонової музики
+    lobbyMusic.pause();
+    lobbyMusic.currentTime = 0;
+    
     currentRoom = data.roomId;
     isHost = data.isHost;
     roomCodeDisplay.textContent = data.roomId;
@@ -376,6 +420,17 @@ socket.on('choice-timer-update', (data) => {
     const choiceTimerEl = document.getElementById('choiceTimer');
     if (choiceTimerEl) {
         choiceTimerEl.textContent = data.time;
+        
+        // Відтворення тікання годинника на останніх 3 секундах
+        if (data.time <= 3 && data.time > 0 && !isClockTicking) {
+            isClockTicking = true;
+            clockTickSound.currentTime = 0;
+            clockTickSound.play().catch(e => console.log('Audio play failed:', e));
+        } else if (data.time > 3 || data.time === 0) {
+            isClockTicking = false;
+            clockTickSound.pause();
+            clockTickSound.currentTime = 0;
+        }
     }
 });
 
@@ -409,6 +464,17 @@ socket.on('timer-update', (data) => {
     const time = typeof data === 'number' ? data : data.time;
     timerEl.textContent = time;
     
+    // Відтворення тікання годинника на останніх 3 секундах
+    if (time <= 3 && time > 0 && !isClockTicking) {
+        isClockTicking = true;
+        clockTickSound.currentTime = 0;
+        clockTickSound.play().catch(e => console.log('Audio play failed:', e));
+    } else if (time > 3 || time === 0) {
+        isClockTicking = false;
+        clockTickSound.pause();
+        clockTickSound.currentTime = 0;
+    }
+    
     // Оновлення підказки зі словом (якщо не художник)
     if (!isDrawer && data.word) {
         secretWord.textContent = data.word;
@@ -440,12 +506,21 @@ socket.on('close-guess', (data) => {
 });
 
 socket.on('correct-guess', (data) => {
+    // Відтворення звуку правильної відповіді
+    correctAnswerSound.currentTime = 0;
+    correctAnswerSound.play().catch(e => console.log('Audio play failed:', e));
+    
     addChatMessage(`${data.player} вгадав слово і отримав ${data.points} очок!`, true);
     players = data.scores.map(p => ({ ...p, isDrawer: false }));
     updateGamePlayers(playersList);
 });
 
 socket.on('round-end', (data) => {
+    // Зупинка тікання годинника
+    isClockTicking = false;
+    clockTickSound.pause();
+    clockTickSound.currentTime = 0;
+    
     const message = data.guessed 
         ? `Раунд завершено! Слово було: "${data.word}"`
         : `Час вийшов! Слово було: "${data.word}"`;
@@ -462,3 +537,4 @@ socket.on('error', (data) => {
 
 // Ініціалізація
 initCanvas();
+initLobbyMusic();

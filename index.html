@@ -13,6 +13,12 @@
             <h1>🎨 Вгадай слово по малюнку</h1>
             <p class="subtitle">Мультиплеєрна онлайн гра</p>
             
+            <!-- Повзунок гучності -->
+            <div class="volume-control">
+                <label for="volumeSlider">🔊</label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="30">
+            </div>
+            
             <div class="lobby-form">
                 <input type="text" id="playerName" placeholder="Введіть ваше ім'я..." maxlength="20" required>
                 
@@ -128,6 +134,17 @@
             </main>
         </div>
     </div>
+
+    <!-- Аудіо ефекти -->
+    <audio id="lobbyMusic" loop preload="auto">
+        <source src="audio/Tudy-siudy i smert.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clockTickSound" preload="auto">
+        <source src="audio/ClockTickingSound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctAnswerSound" preload="auto">
+        <source src="audio/СorectAnswerSound.mp3" type="audio/mpeg">
+    </audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
