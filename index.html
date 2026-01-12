@@ -13,12 +13,6 @@
             <h1>🎨 Вгадай слово по малюнку</h1>
             <p class="subtitle">Мультиплеєрна онлайн гра</p>
             
-            <!-- Повзунок гучності -->
-            <div class="volume-control">
-                <label for="volumeSlider">🔊</label>
-                <input type="range" id="volumeSlider" min="0" max="100" value="30">
-            </div>
-            
             <div class="lobby-form">
                 <input type="text" id="playerName" placeholder="Введіть ваше ім'я..." maxlength="20" required>
                 
@@ -96,6 +90,14 @@
                             <div class="canvas-with-tools">
                                 <div class="tools" id="drawingTools">
                                     <div class="tool-group">
+                                        <label>Інструмент:</label>
+                                        <div class="tool-buttons">
+                                            <button id="brushBtn" class="tool-btn active" title="Пензель">✏️</button>
+                                            <button id="eraserBtn" class="tool-btn" title="Гумка">🧽</button>
+                                            <button id="bucketBtn" class="tool-btn" title="Заливка">🧺</button>
+                                        </div>
+                                    </div>
+                                    <div class="tool-group">
                                         <label>Колір:</label>
                                         <div class="color-presets">
                                             <button class="color-btn" data-color="#000000" style="background: #000000;" title="Чорний"></button>
@@ -135,10 +137,24 @@
         </div>
     </div>
 
-    <!-- Аудіо ефекти -->
-    <audio id="lobbyMusic" loop preload="auto">
-        <source src="audio/Tudy-siudy i smert.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Музичний плеєр (глобальний) -->
+    <div id="musicPlayer" class="music-player">
+        <div class="music-info">
+            <div class="music-icon">🎵</div>
+            <div class="music-title" id="musicTitle">Завантаження...</div>
+            <button id="prevBtn" class="control-btn" title="Попередній трек">⏮️</button>
+            <button id="playPauseBtn" class="control-btn" title="Відтворення/Пауза">⏸️</button>
+            <button id="nextBtn" class="control-btn" title="Наступний трек">⏭️</button>
+        </div>
+      
+        <div class="volume-control-global">
+            <label for="volumeSlider">🔊</label>
+            <input type="range" id="volumeSlider" min="0" max="100" value="1">
+        </div>
+    </div>
+
+    <!-- Аудіо елементи -->
+    <audio id="playlistAudio" preload="auto"></audio>
     <audio id="clockTickSound" preload="auto">
         <source src="audio/ClockTickingSound.mp3" type="audio/mpeg">
     </audio>

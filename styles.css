@@ -22,6 +22,114 @@ body {
     display: none !important;
 }
 
+/* Музичний плеєр (глобальний, завжди видимий) */
+.music-player {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 5px 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    min-width: 280px;
+    backdrop-filter: blur(10px);
+}
+
+.music-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.music-icon {
+    font-size: 1em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.music-title {
+    font-size: 0.9em;
+    color: #667eea;
+    font-weight: bold;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.control-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.control-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.volume-control-global {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-control-global label {
+    font-size: 1.2em;
+}
+
+.volume-control-global input[type="range"] {
+    flex: 1;
+    cursor: pointer;
+    height: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.volume-control-global input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.volume-control-global input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
 /* Модальне вікно вибору слова */
 .modal {
     position: fixed;
@@ -119,48 +227,6 @@ body {
     color: #666;
     margin-bottom: 20px;
     font-size: 1.1em;
-}
-
-.volume-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.volume-control label {
-    font-size: 1.2em;
-}
-
-#volumeSlider {
-    width: 150px;
-    height: 5px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: #ddd;
-    border-radius: 5px;
-    outline: none;
-    cursor: pointer;
-}
-
-#volumeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #667eea;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-#volumeSlider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    background: #667eea;
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
 }
 
 .lobby-form {
@@ -548,6 +614,57 @@ header h1 {
     text-align: center;
 }
 
+/* Кнопки інструментів */
+.tool-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px 10px;
+    font-size: 1.1em;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background: #f0f0f0;
+    border-color: #667eea;
+}
+
+.tool-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+/* Контроль фону */
+.background-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+#bgColorPicker {
+    flex: 1;
+    height: 35px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#fillBgBtn {
+    padding: 8px 12px;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
 #clearBtn {
     margin-top: 5px;
     width: 100%;
@@ -759,6 +876,17 @@ canvas.disabled {
     .screen {
         min-height: 95vh;
         padding: 10px 5px;
+    }
+
+    /* Компактніший плеєр на планшетах */
+    .player-controls {
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .control-btn {
+        padding: 6px 10px;
+        font-size: 1em;
     }
 
     /* Модальне вікно на мобільних */
@@ -1023,6 +1151,17 @@ canvas.disabled {
 }
 
 @media (max-width: 480px) {
+    /* Ще компактніші кнопки плеєра */
+    .player-controls {
+        gap: 5px;
+        margin-bottom: 6px;
+    }
+
+    .control-btn {
+        padding: 5px 8px;
+        font-size: 0.9em;
+    }
+
     header h1 {
         font-size: 0.95em;
     }

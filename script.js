@@ -33,11 +33,29 @@ const roundNumber = document.getElementById('roundNumber');
 const timerEl = document.getElementById('timer');
 
 // Аудіо елементи
-const lobbyMusic = document.getElementById('lobbyMusic');
+const playlistAudio = document.getElementById('playlistAudio');
 const clockTickSound = document.getElementById('clockTickSound');
 const correctAnswerSound = document.getElementById('correctAnswerSound');
 const volumeSlider = document.getElementById('volumeSlider');
+const musicTitle = document.getElementById('musicTitle');
 let isClockTicking = false;
+
+// Плейлист пісень
+const playlist = [
+    { name: 'Dnipro', file: 'audio/playlist/Dnipro.mp3' },
+    { name: 'Nove oblychchia', file: 'audio/playlist/Nove oblychchia.mp3' },
+    { name: 'Pohliady', file: 'audio/playlist/Pohliady .mp3' },
+    { name: 'Popaiane mistse', file: 'audio/playlist/Popaiane mistse.mp3' },
+    { name: 'Propashchi roky', file: 'audio/playlist/Propashchi roky.mp3' },
+    { name: 'Staryi telefon', file: 'audio/playlist/Staryi telefon.mp3' },
+    { name: 'Tam, de znykaiut slidy', file: 'audio/playlist/Tam, de znykaiut slidy.mp3' },
+    { name: 'Tilky mrii', file: 'audio/playlist/Tilky mrii .mp3' },
+    { name: 'Tudy-siudy i smert', file: 'audio/playlist/Tudy-siudy i smert.mp3' },
+    { name: 'Ty mene ne znaiesh', file: 'audio/playlist/Ty mene ne znaiesh.mp3' },
+    { name: 'Ya maliuiu znak', file: 'audio/playlist/Ya maliuiu znak.mp3' }
+];
+let currentTrackIndex = -1;
+let shuffledPlaylist = [];
 
 // Встановлення гучності для звукових ефектів
 clockTickSound.volume = 0.20;
@@ -58,58 +76,170 @@ const brushSizeValue = document.getElementById('brushSizeValue');
 const clearBtn = document.getElementById('clearBtn');
 const drawingTools = document.getElementById('drawingTools');
 
+// Нові елементи: гумка та заливка
+const brushBtn = document.getElementById('brushBtn');
+const eraserBtn = document.getElementById('eraserBtn');
+const bucketBtn = document.getElementById('bucketBtn');
+
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let currentTool = 'brush'; // 'brush', 'eraser' або 'bucket'
+let backgroundColor = '#FFFFFF'; // Колір фону
 
 // Ініціалізація canvas
 function initCanvas() {
     canvas.width = 800;
     canvas.height = 600;
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = colorPicker.value;
     ctx.lineWidth = brushSize.value;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 }
 
-// Ініціалізація фонової музики
-function initLobbyMusic() {
-    lobbyMusic.volume = volumeSlider.value / 100;
+// Ініціалізація плейлиста
+function initPlaylist() {
+    playlistAudio.volume = volumeSlider.value / 100;
     
-    // Спроба запустити музику відразу
-    const playMusic = () => {
-        lobbyMusic.play().catch(e => {
-            // Браузер може блокувати автоплей, тому запускаємо при першій взаємодії
+    // Створення перемішаного плейлиста
+    shuffledPlaylist = [...playlist];
+    shuffleArray(shuffledPlaylist);
+    
+    // Початок відтворення першого трека
+    playNextTrack();
+    
+    // Коли трек закінчився - наступний
+    playlistAudio.addEventListener('ended', () => {
+        playNextTrack();
+    });
+    
+    // Спроба автоплею
+    const startPlayback = () => {
+        playlistAudio.play().catch(e => {
             console.log('Autoplay blocked, will start on user interaction');
             document.addEventListener('click', () => {
-                lobbyMusic.play().catch(err => console.log('Music play failed:', err));
+                playlistAudio.play().catch(err => console.log('Music play failed:', err));
             }, { once: true });
         });
     };
     
-    // Якщо аудіо вже готове - запускаємо відразу
-    if (lobbyMusic.readyState >= 3) {
-        playMusic();
+    if (playlistAudio.readyState >= 3) {
+        startPlayback();
     } else {
-        // Інакше чекаємо поки завантажиться
-        lobbyMusic.addEventListener('canplaythrough', playMusic, { once: true });
+        playlistAudio.addEventListener('canplaythrough', startPlayback, { once: true });
+    }
+}
+
+// Функція перемішування масиву
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Відтворення наступного трека
+function playNextTrack() {
+    currentTrackIndex++;
+    
+    // Якщо плейлист закінчився - перемішати і почати спочатку
+    if (currentTrackIndex >= shuffledPlaylist.length) {
+        currentTrackIndex = 0;
+        shuffleArray(shuffledPlaylist);
+    }
+    
+    loadAndPlayTrack();
+}
+
+// Відтворення попереднього трека
+function playPrevTrack() {
+    currentTrackIndex--;
+    
+    // Якщо це перший трек - перейти в кінець плейлиста
+    if (currentTrackIndex < 0) {
+        currentTrackIndex = shuffledPlaylist.length - 1;
+    }
+    
+    loadAndPlayTrack();
+}
+
+// Завантаження та відтворення треку
+function loadAndPlayTrack() {
+    const track = shuffledPlaylist[currentTrackIndex];
+    playlistAudio.src = track.file;
+    musicTitle.textContent = track.name;
+    playlistAudio.play().catch(err => console.log('Track play failed:', err));
+    updatePlayPauseButton();
+}
+
+// Оновлення кнопки play/pause
+function updatePlayPauseButton() {
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playlistAudio.paused) {
+        playPauseBtn.textContent = '▶️';
+        playPauseBtn.title = 'Відтворення';
+    } else {
+        playPauseBtn.textContent = '⏸️';
+        playPauseBtn.title = 'Пауза';
     }
 }
 
 // Контроль гучності
 volumeSlider.addEventListener('input', (e) => {
-    lobbyMusic.volume = e.target.value / 100;
+    playlistAudio.volume = e.target.value / 100;
 });
+
+// Кнопки керування плеєром
+const playPauseBtn = document.getElementById('playPauseBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+playPauseBtn.addEventListener('click', () => {
+    if (playlistAudio.paused) {
+        playlistAudio.play().catch(err => console.log('Play failed:', err));
+    } else {
+        playlistAudio.pause();
+    }
+    updatePlayPauseButton();
+});
+
+prevBtn.addEventListener('click', () => {
+    playPrevTrack();
+});
+
+nextBtn.addEventListener('click', () => {
+    playNextTrack();
+});
+
+// Оновлення кнопки при зміні стану аудіо
+playlistAudio.addEventListener('play', updatePlayPauseButton);
+playlistAudio.addEventListener('pause', updatePlayPauseButton);
 
 // Функції малювання
 function startDrawing(e) {
     if (!isDrawer) return;
-    isDrawing = true;
+    
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    lastX = (e.clientX - rect.left) * scaleX;
-    lastY = (e.clientY - rect.top) * scaleY;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
+    
+    // Якщо інструмент заливки - заливаємо фон
+    if (currentTool === 'bucket') {
+        backgroundColor = colorPicker.value;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        socket.emit('fill-background', { color: backgroundColor });
+        return;
+    }
+    
+    isDrawing = true;
+    lastX = clickX;
+    lastY = clickY;
 }
 
 function draw(e) {
@@ -132,15 +262,19 @@ function draw(e) {
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(currentX, currentY);
-    ctx.strokeStyle = colorPicker.value;
+    
+    // Якщо гумка - використовуємо колір фону
+    const drawColor = currentTool === 'eraser' ? backgroundColor : colorPicker.value;
+    ctx.strokeStyle = drawColor;
     ctx.lineWidth = brushSize.value;
     ctx.stroke();
     
     // Відправка даних малювання на сервер
     socket.emit('draw', {
         lastX, lastY, currentX, currentY,
-        color: colorPicker.value,
-        width: brushSize.value
+        color: drawColor,
+        width: brushSize.value,
+        tool: currentTool
     });
     
     lastX = currentX;
@@ -214,11 +348,35 @@ colorBtns.forEach(btn => {
     });
 });
 
+// Перемикання інструментів: пензель/гумка/заливка
+brushBtn.addEventListener('click', () => {
+    currentTool = 'brush';
+    brushBtn.classList.add('active');
+    eraserBtn.classList.remove('active');
+    bucketBtn.classList.remove('active');
+});
+
+eraserBtn.addEventListener('click', () => {
+    currentTool = 'eraser';
+    eraserBtn.classList.add('active');
+    brushBtn.classList.remove('active');
+    bucketBtn.classList.remove('active');
+});
+
+bucketBtn.addEventListener('click', () => {
+    currentTool = 'bucket';
+    bucketBtn.classList.add('active');
+    brushBtn.classList.remove('active');
+    eraserBtn.classList.remove('active');
+});
+
 // Очистка canvas
 clearBtn.addEventListener('click', () => {
     if (!isDrawer) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    socket.emit('clear-canvas');
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    socket.emit('clear-canvas', { bgColor: backgroundColor });
 });
 
 // Створення кімнати
@@ -354,10 +512,6 @@ function selectWord(index) {
 
 // Обробники подій Socket.IO
 socket.on('room-created', (data) => {
-    // Зупинка фонової музики
-    lobbyMusic.pause();
-    lobbyMusic.currentTime = 0;
-    
     currentRoom = data.roomId;
     isHost = data.isHost;
     roomCodeDisplay.textContent = data.roomId;
@@ -371,10 +525,6 @@ socket.on('room-created', (data) => {
 });
 
 socket.on('room-joined', (data) => {
-    // Зупинка фонової музики
-    lobbyMusic.pause();
-    lobbyMusic.currentTime = 0;
-    
     currentRoom = data.roomId;
     isHost = data.isHost;
     roomCodeDisplay.textContent = data.roomId;
@@ -494,8 +644,20 @@ socket.on('draw', (data) => {
     ctx.stroke();
 });
 
-socket.on('clear-canvas', () => {
+socket.on('clear-canvas', (data) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (data && data.bgColor) {
+        backgroundColor = data.bgColor;
+    }
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+});
+
+socket.on('fill-background', (data) => {
+    backgroundColor = data.color;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 });
 
 socket.on('chat-message', (data) => {
@@ -541,4 +703,4 @@ socket.on('error', (data) => {
 
 // Ініціалізація
 initCanvas();
-initLobbyMusic();
+initPlaylist();
